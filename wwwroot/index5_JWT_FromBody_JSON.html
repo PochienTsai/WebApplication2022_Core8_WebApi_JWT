@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>JWT（Client端的首頁）</title>
+
+    <!-- Client端的程式  如下 。資料來源 https://dotblogs.com.tw/wellwind/2016/11/24/jwt-auth-web-api -->
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js" type="text/javascript"></script>
+        
+    <script>
+        //var apiServerUrl = 'https://localhost:7279/api/HomeDB/';   // 請自行修改URL
+        var apiServerUrl = '/api/HomeDB/';   // 請自行修改URL
+        var userJsonData = {
+            'UserName': 'MIS2000 Lab.',    // 從 Client傳JSON到Server端。
+            'UserId': 1
+        };
+
+        $(document).ready(function () {
+
+            //-----------------------------------------------------------------------------------------------
+            // Error 415
+            $('#btnGetToken').click(function () {    // 步驟一（第一種寫法），透過POST (jQuery) 連到WebAPI
+                //$.post(apiServerUrl, {
+                //    UserName: $('#UNAME').val(),   // 抓取底下表單 的 文字輸入方塊，輸入的數值
+                //    UserId: $('#UID').val()
+                //}, JSON)
+
+                //$.post(apiServerUrl, {
+                //    'UserName': '神雕大俠',   // 直接寫好 JSON格式的數值，傳給Server
+                //    'UserId': '4'
+                //}, JSON)
+
+                $.post(apiServerUrl, JSON.stringify(userJsonData), JSON)
+                //$.post(apiServerUrl, userJsonData, JSON)
+                    .done(function (data) {
+                        if (data.Result !== undefined && data.Result) {
+                            $('#userResult').val(data.user);   // 依照對方 WebAPI傳回的兩個區塊名稱（user與token）來改寫
+                            $('#tokenResult').val(data.token);
+                        } else {
+                            $('#userResult').val(' (1) done - error 成功，但沒接收到傳回值');  // 成功，但沒接收到傳回值
+                            $('#tokenResult').val(' (1) done - error 成功，但沒接收到傳回值');
+                        }
+                    })
+                    .fail(function (err) {
+                        $('#userResult').val('(1) fail 失敗，連不上WebAPI \n' + err.responseText);     // 失敗，連不上WebAPI
+                        $('#tokenResult').val('(1) fail 失敗，連不上WebAPI \n' + err.responseText);
+                    });
+            });
+
+            // Error 400
+            //$('#btnGetToken').click(function () {     // 步驟一（第二種寫法），透過POST 連到WebAPI
+            //    $.ajax({
+            //        url: apiServerUrl,
+            //        //url: 'https://localhost:7279/api/HomeDB/',
+            //        type: 'POST',
+            //        dataType: 'json',
+            //        data: userJsonData,
+            //        //data: {
+            //        //    'UserName': 'MIS2000 Lab.',
+            //        //    'UserId': 1
+            //        //},
+            //        contentType: 'application/json; charset=utf-8',
+            //        headers: {
+            //            'Accept': 'application/json',
+            //            'Content-Type': 'application/json'
+            //        },
+            //        success: function (data) {
+            //            $('#userResult').val(JSON.stringify(data));
+            //            $('#tokenResult').val(JSON.stringify(data));
+            //        },
+            //        error: function (data) {
+            //            $('#userResult').val(' (2) 失敗\n   ' + data.responseText);
+            //            $('#tokenResult').val(' (2) 失敗\n   ' + data.responseText);
+            //        }
+            //    })
+            //})
+
+
+            //-----------------------------------------------------------------------------------------------
+
+            $('#btnGetData').click(function () {     // 步驟二，透過GET 連到WebAPI
+                $.ajax({
+                    url: apiServerUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    headers: {
+                        Authorization: 'Bearer ' + $('#tokenResult').val()
+                    },
+                    headers: {
+                       'Accept': 'application/json',
+                       'Content-Type': 'application/json'
+                    },
+
+                    success: function (data) {
+                        $('#result2').val(JSON.stringify(data));
+                    },
+                    error: function (data) {
+                        $('#result2').val('失敗\n  ' + data.responseText);
+                    }
+                })
+            })
+        });
+
+            //// ** 一執行網頁就自動執行，不需按下按鈕。 **
+            //// Build an object which matches the structure of our view model class
+            //// 傳遞JSON格式到 Server端。（Server端註明 [FromBody]，需要搭配特定的 ViewModel）
+            //// 資料來源 https://stackoverflow.com/questions/20226169/how-to-pass-json-post-data-to-web-api-method-as-an-object  <br />
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',    //*****重點！！******
+                dataType: 'json',
+                //data: JSON.stringify(userJsonData),   // Error 500
+                data: userJsonData,                              // Error 400
+                    //data: {
+                    //    'UserName': 'MIS2000 Lab.',    // Error 400
+                    //    'UserId': 1
+                    //},
+
+                //*****重點！！******
+                url: apiServerUrl,
+                //url: 'https://localhost:7279/api/HomeDB/',   // 請自行修改URL
+                //url: '/api/HomeDB/',   // 請自行修改URL
+
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                //Access-Control-Allow-Origin: "*"    //*****重點！！******（不然會出錯 - No 'Access-Control-Allow-Origin' header is present on the requested resource.）
+            })
+             .done(function (data) {
+                    console.log('result(一執行網頁就自動執行，不需按下按鈕)', data);   // 請使用瀏覽器的 F12來觀察結果。
+             })
+             .fail(function (err) {
+                    $('#result3').val('失敗\n  ' + err.responseText); 
+             });
+    </script>
+
+</head>
+<body>
+    <h3>Client端呼叫 WebAPI #5 -- JWT</h3>
+    ****************************************************<br />
+    資料來源 https://dotblogs.com.tw/wellwind/2016/11/24/jwt-auth-web-api  <br />
+
+    <span>
+        步驟一：<br />
+        帳號： <input type="text" id="UserName" value="MIS2000 Lab."><br />
+        密碼： <input type="password" id="UserId" value="1"><br /><br />
+
+        <button id="btnGetToken">Get Token（登入並取得token）</button>
+
+        <br /><br />
+        傳回值user： <textarea id="userResult" style="width:100%"></textarea>
+        <br /><br />
+        傳回值token： <textarea id="tokenResult" style="width:100%"></textarea>
+    </span>
+
+    <div>
+        <!--  ------------------------------------------------------------------------  -->
+        <br /><hr /><br />
+        步驟二：<br />
+        <textarea id="result2" style="width:100%; height:100px"></textarea>
+        <br />
+        <button id="btnGetData">Get Data</button>
+    </div>
+
+
+    <div>
+        <!--  ------------------------------------------------------------------------  -->
+        <br /><hr /><br />
+        步驟三：一執行網頁就自動執行，不需按下按鈕。<br />
+        <textarea id="result3" style="width:100%; height:100px"></textarea>
+    </div>
+
+</body>
+</html >

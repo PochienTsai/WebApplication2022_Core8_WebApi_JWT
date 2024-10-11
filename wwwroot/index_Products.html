@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Product App（Client端的首頁）</title>
+
+    <!--
+    // 檢視畫面（UI網頁），放在 /wwwroot目錄底下，名為 index_Products.html
+    // 類別檔，放在 /Models/Product.cs
+    // WebAPI控制器 - /Controllers/ProductsController
+    -->
+    <!-- Client端的程式  如下 -->
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        var uri = 'api/Products';
+
+        $(document).ready(function () {
+            // Send an AJAX request
+            $.getJSON(uri)     // 呼叫 GetAllProducts()
+                .done(function (data) {
+                    // On success, 'data' contains a list of products.
+                    $.each(data, function (key, item) {
+                        // Add a list item for the product.
+                        $('<li>', { text: formatItem(item) }).appendTo($('#display_one'));
+                    });
+                });
+        });
+
+        //==========================================
+        function find() {
+            var id = $('#prodId').val();
+            $.getJSON(uri + '/' + id)     // 呼叫 GetProduct(int id)
+                .done(function (data) {
+                    $('#display_two').text(formatItem(data));
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $('#display_two').text('錯誤訊息：' + err);
+                });
+        }
+
+
+        // 上面兩個程式共用的 function
+        function formatItem(item) {
+            return item.Name + ': $' + item.Price;
+        }
+    </script>
+
+</head>
+<body>
+    <h3>Client端呼叫 WebAPI #1</h3>
+    ****************************************************<br />
+
+    <div>
+        <h3>列出所有產品：</h3>
+        <hr />（第一次執行，請稍等幾秒）<br />
+
+        <ul id="display_one" />    <!-- ********************* -->
+    </div>
+
+    <div>
+        <hr /><br />jQuery的寫法：
+        <h3>請輸入 ID：</h3>
+        <input type="text" id="prodId" size="2" />（數字 1~6）  <br /><br />
+        <input type="button" value="Search（jQuery / 展示單一筆產品）" onclick="find();" />
+
+        <br /><br />
+        <p id="display_two" />    <!-- ********************* -->
+    </div>
+
+    <!-- ======================================================= -->
+
+    <hr /><br />改用 JavaScript (XMLHttpRequest)來撰寫：
+    
+    <h3>請輸入 ID：</h3>
+    <input type="text" id="prodId2" size="2" />（數字 1~6）  <br /><br />
+    <button onclick="myFunction()">Search（JavaScript / 展示單一筆產品）</button>
+
+    <br /><br />
+    <p id="display_three" />    <!-- ********************* -->
+    
+    
+    <!-- 介紹 JavaScript & jQuery語法的文章
+        https://medium.freecodecamp.org/here-is-the-most-popular-ways-to-make-an-http-request-in-javascript-954ce8c95aaa -->
+    
+    <!-- 改用 JavaScript 來寫 -->
+    <script type="text/javascript">
+        function myFunction() {
+            var xhr = new XMLHttpRequest();   // https://www.w3schools.com/js/js_json_http.asp
+            var pid = document.getElementById("prodId2").value;
+
+            xhr.open('GET', 'api/Products/' + pid, true);
+            xhr.send();
+
+            //第一種寫法：
+            //xhr.onload = function () {
+            //    // Begin accessing JSON data here
+            //    if (xhr.status >= 200 && xhr.status < 400) {
+            //        //console.log(xhr.responseText)
+            //        var data = JSON.parse(xhr.responseText);   // https://msdn.microsoft.com/zh-tw/library/cc836466(v=vs.94).aspx
+            //        document.getElementById("display_three").innerHTML = data.Name + ': $' + data.Price;
+            //    } else {
+            //        document.getElementById("display_three").innerHTML = "Error";
+            //    }
+            //}
+
+            // 第二種寫法：
+            xhr.onreadystatechange = (e) => {
+                //if (xhr.status >= 200) {  // .NET 4.x版的寫法，但 .NET Core出現問題
+                if (xhr.readyState == 4 && xhr.status == 200) {  // https://stackoverflow.com/questions/13763219/javascript-json-parse-responsetext-unexpected-end-of-input
+                    //console.log(xhr.responseText)
+                    var data = JSON.parse(xhr.responseText);   // https://msdn.microsoft.com/zh-tw/library/cc836466(v=vs.94).aspx
+                    document.getElementById("display_three").innerHTML = data.Name + ': $' + data.Price;
+                } else {
+                    document.getElementById("display_three").innerHTML = "Error";
+                }
+            }
+            //*** 參考資料 ******
+            // Connect to an API with JavaScript -- https://www.taniarascia.com/how-to-connect-to-an-api-with-javascript/
+            // 微軟範例 -- https://blogs.msdn.microsoft.com/armenk/2012/11/23/consuming-web-api-using-javascript-and-xmlhttprequest-method/
+            // 讚！ 完整 WebAPI CRUD的 JavaScript -- https://gist.github.com/EtienneR/2f3ab345df502bd3d13e
+            // https://itbilu.com/javascript/js/NkzjoC4j.html
+        }
+    </script>
+
+</body>
+</html >

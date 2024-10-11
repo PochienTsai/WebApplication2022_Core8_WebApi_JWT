@@ -2,10 +2,6 @@
 *.asp
 *.cer
 *.csr
-*.css
-*.htm
-*.html
-*.js
 *.jsp
 *.php
 *.rss
@@ -40,8 +36,6 @@ bld/
 
 # Visual Studio 2015 cache/options directory
 .vs/
-# Uncomment if you have tasks that create the project's static files in wwwroot
-#wwwroot/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -303,10 +297,6 @@ mono_crash.*
 [Aa][Rr][Mm]64/
 [Ll]ogs/
 
-# Visual Studio 2015/2017 cache/options directory
-# Uncomment if you have tasks that create the project's static files in wwwroot
-#wwwroot/
-
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
@@ -552,10 +542,6 @@ FodyWeavers.xsd
 # Mono auto generated files
 
 # Build results
-
-# Visual Studio 2015/2017 cache/options directory
-# Uncomment if you have tasks that create the project's static files in wwwroot
-#wwwroot/
 
 # Visual Studio 2017 auto generated files
 

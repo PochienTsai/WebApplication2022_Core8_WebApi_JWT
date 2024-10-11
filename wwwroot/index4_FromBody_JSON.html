@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Product App（Client端的首頁）</title>
+    <!--  搭配 Client端（/wwwroort目錄下的 index4_FromBody_JSON.html）
+            搭配 Server端（控制器，ValuesController）  -->
+
+    <!-- Client端的程式  如下 -->
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        //var uri = 'api/products';
+
+        //Build an object which matches the structure of our view model class
+        //傳遞JSON格式到 Server端。（Server端註明 [FromBody]，需要搭配特定的 ViewModel）
+        var model = {
+            Name: "MIS2000Lab",    // 從 Client傳JSON到Server端，修改這個數值。
+            Id: 123,
+            Tags: [{ Id: 12, Code: "C" }, { Id: 33, Code: "Swift" }]
+        };
+
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(model),    //*****重點！！******
+            url: "api/Values",
+            contentType: "application/json"    //*****重點！！******
+        }).done(function (res) {
+            console.log('result', res);   // 請使用瀏覽器的 F12來觀察結果。圖片檔： Index4_result.jpg
+        });
+
+
+    </script>
+
+</head>
+<body>
+    <h3>Client端呼叫 WebAPI #4 -- Client端傳來JSON格式（Server端註明 [FromBody]）</h3>
+    ****************************************************<br />
+    資料來源 https://stackoverflow.com/questions/20226169/how-to-pass-json-post-data-to-web-api-method-as-an-object
+    <br />
+
+
+    <div>
+        <h3>請使用瀏覽器的 F12來觀察結果</h3>
+        圖片檔： Index4_result.jpg
+
+    </div>
+    <hr />
+    如果您要自己輸入JSON文件，請輸入下面內容：（注意「雙引號」必須寫得工整，不然會報錯！）<br />
+    <font color="red">
+        {
+        "Name": "MIS2000Lab",
+        "Id": 123,
+        "Tags": [{ "Id": 12, "Code": "C" }, { "Id": 33, "Code": "Swift" }]
+        }
+    </font>
+
+
+</body>
+</html >
