@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers> <!-- 啟用 OpenAPI 分析器，以便在 Swagger 上顯示註解並確保生成符合規範的 API。-->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile> <!-- Enable XML documentation file generation 這可讓swagger上可顯示註解-->
+    <NoWarn>$(NoWarn);1591</NoWarn><!--如果有公開的類型或成員沒有 XML 註解，則不要顯示警告 -->
     <InvariantGlobalization>false</InvariantGlobalization>
 	  <!-- .NET 8.0專用  https://stackoverflow.com/questions/76394279/scaffold-dbcontext-culturenotfoundexception-only-the-invariant-culture-is-sup -->
   </PropertyGroup>
