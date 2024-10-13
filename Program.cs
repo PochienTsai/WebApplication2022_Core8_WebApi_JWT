@@ -39,38 +39,27 @@ using WebApplication2022_Core8_WebApi_JWT.Models_MVC_UserLogin;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// 添加 CORS 服務
+//避免Client端寫JS時，遇見問題「跨原始來源要求 (CORS)  / Access - Control - Allow - Origin」
+builder.Services.AddCors(options =>
+{
+    // 配置全局允許所有來源的CORS策略(預設）
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin() // 允許任何來源
+            .AllowAnyMethod() // 允許所有HTTP方法（GET、POST、PUT、DELETE等）
+            .AllowAnyHeader(); // 允許所有標頭
+    });
 
+    // 配置僅允許特定來源的CORS策略
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
+        builder.WithOrigins("http://example.com", "http://anotherexample.com")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 builder.Services.AddControllers();
-
-
-//***************************************************************
-// 開放CORS的設定 #1。不然前端程式會無法存取 .NET Core WebAPI
-// //（底下的 app還有另一個搭配的設定，別忘記！）
-//builder.Services.AddCors(options => options.AddPolicy(name: "mis2000labOrigins",
-//    policy =>
-//    {
-//        policy.WithOrigins("http://localhost:44450").AllowAnyMethod().AllowAnyHeader();
-//    }));
-
-// （暫時沒用到）避免Client端寫JS時，遇見問題「跨原始來源要求 (CORS)  / Access - Control - Allow - Origin」
-//string MyAllowSpecificOriginsCORS = "_myAllowSpecificOrigins";
-
-//#region  // （暫時沒用到） 避免Client端寫JS時，遇見問題「跨原始來源要求 (CORS)  / Access - Control - Allow - Origin」
-//// https://docs.microsoft.com/zh-tw/aspnet/core/security/cors?view=aspnetcore-5.0
-//var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(MyAllowSpecificOrigins,
-//                          policy =>
-//                          {
-//                              policy.WithOrigins("http://example.com",
-//                                                  "http://www.contoso.com")    // 限定某些網站才能存取。如果是builder.WithOrigins("*");   // 全部開放
-//                                                  .AllowAnyHeader()
-//                                                  .AllowAnyMethod();
-//                          });
-//});
-//#endregion
-
 
 #region // （第一個範例）  JWT (json web token) 才會用到這一段
 
@@ -270,20 +259,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles(); // ASP.NET Core 中的靜態檔案
 // https://learn.microsoft.com/zh-tw/aspnet/core/fundamentals/static-files?view=aspnetcore-7.0
 
-//***************************************************************
-// 開放CORS的設定 #2。不然前端程式會無法存取 .NET Core WebAPI
-//app.UseCors("mis2000labOrigins");   //************************
-
-//// （暫時沒用到）避免Client端寫JS時，遇見問題「跨原始來源要求 (CORS)  / Access - Control - Allow - Origin」
-////app.UseCors(MyAllowSpecificOriginsCORS);
-////********************************************
-
-//// 避免Client端寫JS時，遇見問題「跨原始來源要求 (CORS)  / Access - Control - Allow - Origin」
-//// ASP.NET CORE : How to enable Cross Origin Request| CORS
-//// 在 ASP.NET Core 中啟用 CORS (跨原始來源要求) https://learn.microsoft.com/zh-tw/aspnet/core/security/cors?view=aspnetcore-7.0
-//// https://www.youtube.com/watch?v=Sd0pnkQIvc8
-//app.UseCors(MyAllowSpecificOrigins);
-
+app.UseCors(); // 使用 CORS middleware(這將應用預設的CORS策略（允許所有來源))
 //**************************************************************
 // JWT (json web token) 才會用到這一段。必須放在 app.UseAuthorization();之前，順序不能錯！
 app.UseAuthentication(); // ** JWT 請自己動手加上這一段 **
